@@ -248,8 +248,6 @@ return emailAutenticado.equals(email);
 2. **Usuário sem token JWT** → ❌ **NEGADO**
 3. **Token JWT inválido** → ❌ **NEGADO**
 
-
-
 ---
 
 ## 📋 Resumo da Implementação
@@ -269,7 +267,5 @@ return emailAutenticado.equals(email);
 ### Impacto
 - ✅ **Vulnerabilidade crítica eliminada**
 - ✅ **Validação dupla implementada** (Spring Security + @PreAuthorize)
-- ✅ **Logs de auditoria** para troubleshooting
-- ✅ **Funcionalidade mantida** para acesso legítimo
 
 ---

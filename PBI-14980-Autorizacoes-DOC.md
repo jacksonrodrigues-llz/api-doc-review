@@ -23,7 +23,7 @@ Implementamos autenticação obrigatória para endpoints específicos:
 @EnableWebSecurity
 @EnableMethodSecurity()
 public class SecurityConfiguration {
-    
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
@@ -48,7 +48,7 @@ public class SecurityConfiguration {
 
 **Arquivo**: `CognitoAutorizacoesService.java`
 
-Implementamos conversão de tokens JWT delegando para serviço hierárquico:
+Implementamos conversão de tokens JWT obtendo o usuário logado pelo e-mail extraído do token delegando para serviço hierárquico:
 
 ```java
 @Service
@@ -64,48 +64,7 @@ public class CognitoAutorizacoesService {
 }
 ```
 
-### 3. Serviço de Autenticação Hierárquica
-
-**Arquivo**: `AutenticacaoHierarquicaService.java`
-
-Implementamos busca de authorities baseada em departamento e tipo de funcionário:
-
-```java
-@Service
-public class AutenticacaoHierarquicaService {
-
-    private final FuncionarioClient funcionarioClient;
-
-    public Collection<GrantedAuthority> obterAutorizacoes(String email) {
-        try {
-            FuncionarioResponse funcionario = buscarFuncionario(email);
-            if (Objects.isNull(funcionario)) {
-                return List.of();
-            }
-            String departamento = funcionario.getDepartamento().nome().toUpperCase();
-            String tipo = funcionario.getTipoFuncionario().descricao().toUpperCase();
-            return List.of(new SimpleGrantedAuthority("ROLE_" + departamento + "_" + tipo));
-        } catch (Exception exception) {
-            log.error("Erro ao obter authorities para {}", email, exception);
-            return List.of();
-        }
-    }
-
-    private FuncionarioResponse buscarFuncionario(String email) {
-        try {
-            ResponseDefault<FuncionarioResponse> response = funcionarioClient.findFuncionarioByEmail(email).getBody();
-            return Objects.nonNull(response) ? response.getResponse() : null;
-        } catch (Exception exception) {
-            log.error("Erro ao buscar funcionário: {}", email, exception);
-            return null;
-        }
-    }
-}
-```
-
-**Padrão de Roles**: `ROLE_{DEPARTAMENTO}_{TIPO_FUNCIONARIO}`
-
-### 4. Validação de Acesso por Email
+### 3. Validação de Acesso por Email
 
 **Arquivo**: `AutenticacaoServico.java`
 
@@ -128,7 +87,7 @@ public class AutenticacaoServico {
 
 **Regra Implementada**: Usuário só pode acessar dados do próprio email.
 
-### 5. Proteção do Endpoint Crítico
+### 4. Proteção do Endpoint Crítico
 
 **Arquivo**: `AuthorizationImpl.java`
 
@@ -185,21 +144,12 @@ return emailAutenticado.equals(email);
 
 ### Cenário da Vulnerabilidade Corrigido
 
-**Antes**: 
+**Antes**:
 - Leonardo (qualquer role) → Acessa dados de Lucas ✅ **PERMITIDO** ❌
 
 **Depois**:
 - Leonardo → Acessa dados de Lucas ❌ **NEGADO** ✅
 - Leonardo → Acessa próprios dados ✅ **PERMITIDO** ✅
-
-### Padrão de Authorities Gerado
-
-**Formato**: `ROLE_{DEPARTAMENTO}_{TIPO_FUNCIONARIO}`
-
-**Exemplos**:
-- `ROLE_TECNOLOGIA_DESENVOLVEDOR`
-- `ROLE_FINANCEIRO_ANALISTA`
-- `ROLE_COMERCIAL_SUPERVISOR`
 
 ---
 

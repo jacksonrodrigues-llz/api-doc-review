@@ -31,8 +31,8 @@ Esta anotação garante que apenas usuários do departamento TECNOLOGIA possam a
 
 ### 2. Autorização Baseada em Roles
 
-- Roles geradas dinamicamente: `ROLE_DEPARTAMENTO_TIPO`
-- Exemplo: `ROLE_TECNOLOGIA_ADMINISTRADOR`
+- Roles geradas dinamicamente: `ROLE_DEPARTAMENTO`
+- Exemplo: `ROLE_TECNOLOGIA`
 - Controle granular por departamento e função
 
 ### 3. Validação de Contexto
@@ -47,7 +47,7 @@ Esta anotação garante que apenas usuários do departamento TECNOLOGIA possam a
 2. **Token JWT validado** → Spring Security valida assinatura e expiração
 3. **Claims extraídos** → CognitoAutorizacoesService processa o token
 4. **Funcionário localizado** → Busca por email no banco de dados
-5. **Role gerada** → Formato ROLE_DEPARTAMENTO_TIPO
+5. **Role gerada** → Formato ROLE_DEPARTAMENTO
 6. **Autorização verificada** → @PreAuthorize valida permissões
 7. **Acesso concedido/negado** → Baseado nas validações
 
